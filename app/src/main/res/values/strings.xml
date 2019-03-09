@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MPDGeologyApp</string>
+    <string name="rawdatadisplay">Select a Seismic Event</string>
+    <string name="acknowledgement">This App Contains British Geological Survey materials ©NERC 2019</string>
+    <string name="salutation">Welcome to the Geology App</string>
+    <string name="startButton">Press to get data</string>
+    <string name="google_maps_key">AIzaSyB-PAJgOXUl6_ooFdJMFU_iKDByajTFloM</string>
+</resources>
