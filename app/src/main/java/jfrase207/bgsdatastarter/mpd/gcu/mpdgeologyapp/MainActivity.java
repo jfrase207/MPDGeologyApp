@@ -182,13 +182,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         for (XMLParser.Item item : myItems) {
-           /* if (item.pubDate == endDate)
-                start = true;
-            else if (item.pubDate == starDate)
-                start = false;
-
-            if (start)
-                list.add(item);*/
 
             if(myItems.indexOf(item) <= startPos && myItems.indexOf(item) >= endPos)
                 list.add(item);
