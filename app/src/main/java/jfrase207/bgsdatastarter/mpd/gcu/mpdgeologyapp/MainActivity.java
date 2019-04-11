@@ -167,15 +167,30 @@ public class MainActivity extends AppCompatActivity {
         List<XMLParser.Item> list = new ArrayList<>();
 
         boolean start = false;
+        int endPos = 0;
+        int startPos = 0;
 
+        for (XMLParser.Item item : myItems)
+        {
+
+            if (item.pubDate == endDate)
+                endPos = myItems.indexOf(item);
+
+            if (item.pubDate == starDate)
+                startPos = myItems.indexOf(item);
+
+        }
 
         for (XMLParser.Item item : myItems) {
-            if (item.pubDate == endDate)
+           /* if (item.pubDate == endDate)
                 start = true;
             else if (item.pubDate == starDate)
                 start = false;
 
             if (start)
+                list.add(item);*/
+
+            if(myItems.indexOf(item) <= startPos && myItems.indexOf(item) >= endPos)
                 list.add(item);
         }
 
