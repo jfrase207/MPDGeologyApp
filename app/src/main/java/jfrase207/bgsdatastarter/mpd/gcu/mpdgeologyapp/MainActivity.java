@@ -30,7 +30,6 @@ import android.widget.Spinner;
 
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -40,11 +39,10 @@ import java.util.List;
 
 import static jfrase207.bgsdatastarter.mpd.gcu.mpdgeologyapp.XMLParser.parse;
 
-public class MainActivity extends AppCompatActivity
-{
+public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "jfrase207.bgsdatastarter.mpd.gcu.mpdgeologyapp.POSITION";
-    private String url1="";
-    private String urlSource="http://quakes.bgs.ac.uk/feeds/MhSeismology.xml";
+    private String url1 = "";
+    private String urlSource = "http://quakes.bgs.ac.uk/feeds/MhSeismology.xml";
     List<XMLParser.Item> myItems = new ArrayList<>();
     private Spinner spinner;
     private Spinner spinner2;
@@ -58,16 +56,89 @@ public class MainActivity extends AppCompatActivity
     public static XMLParser.Item[] originalmDataset;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         current = this;
-        startProgress();
+        new UpdateData().onPreExecute();
+
     }
 
-    public void resViewSetup(List<XMLParser.Item> thisList)
-    {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new UpdateData().execute();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    private class UpdateData extends AsyncTask<Void, Void, List<XMLParser.Item>> {
+
+        URL aurl;
+        URLConnection yc;
+        private Void result;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected List<XMLParser.Item> doInBackground(Void... params) {
+
+            try {
+                aurl = new URL(urlSource);
+                yc = aurl.openConnection();
+                myItems = parse(yc.getInputStream());
+
+
+            } catch (IOException ae) {
+                Log.e("MyTag", "ioexception");
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
+
+            //this method will be running on background thread so don't update UI frome here
+            //do your long running http tasks here,you dont want to pass argument and u can access the parent class' variable url over here
+            return myItems;
+
+        }
+
+        @Override
+        protected void onPostExecute(List<XMLParser.Item> result) {
+
+            super.onPostExecute(result);
+
+            for (XMLParser.Item item : myItems) {
+                item.title = item.summary.split(";")[1];
+
+                String[] date = item.pubDate.split(" ");
+                item.pubDate = date[1];
+                item.pubDate += " " + date[2];
+                item.pubDate += " " + date[3];
+
+                String[] mag = item.summary.split(";");
+                String[] newMag = mag[4].split(":");
+                item.magnitude = newMag[1];
+
+            }
+
+
+            resViewSetup(myItems);
+            addItemsToSpinner(myItems);
+
+
+            //this method will be running on UI thread
+
+        }
+    }
+
+
+    public void resViewSetup(List<XMLParser.Item> thisList) {
         recyclerView = findViewById(R.id.rView);
 
         // use this setting to improve performance if you know that changes
@@ -75,14 +146,13 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter (see also next example)
         XMLParser.Item[] items = new XMLParser.Item[thisList.size()];
         int i = 0;
-        for (XMLParser.Item Item: thisList)
-        {
+        for (XMLParser.Item Item : thisList) {
             items[i] = Item;
             i++;
         }
@@ -93,47 +163,42 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void upRecView(String starDate, String endDate)
-    {
+    public void upRecView(String starDate, String endDate) {
         List<XMLParser.Item> list = new ArrayList<>();
 
         boolean start = false;
 
 
-        for (XMLParser.Item item: myItems) {
-            if(item.pubDate == endDate)
+        for (XMLParser.Item item : myItems) {
+            if (item.pubDate == endDate)
                 start = true;
-            else if(item.pubDate == starDate)
+            else if (item.pubDate == starDate)
                 start = false;
 
-            if(start)
+            if (start)
                 list.add(item);
         }
-
 
 
         XMLParser.Item[] newArray = new XMLParser.Item[list.size()];
 
         int i = 0;
-        for (XMLParser.Item Item: list)
-        {
+        for (XMLParser.Item Item : list) {
             newArray[i] = Item;
             i++;
         }
-
 
 
         mAdapter = new MyAdapter(newArray);
         recyclerView.setAdapter(mAdapter);
     }
 
-    public void upRecViewMag(String maxMag,String minMag)
-    {
+    public void upRecViewMag(String maxMag, String minMag) {
         List<XMLParser.Item> magList = new ArrayList<>();
 
-        for (XMLParser.Item item: myItems) {
+        for (XMLParser.Item item : myItems) {
 
-            if(Float.parseFloat(item.magnitude) <= Float.parseFloat(maxMag) && Float.parseFloat(item.magnitude) >= Float.parseFloat(minMag))
+            if (Float.parseFloat(item.magnitude) <= Float.parseFloat(maxMag) && Float.parseFloat(item.magnitude) >= Float.parseFloat(minMag))
                 magList.add(item);
         }
 
@@ -141,8 +206,7 @@ public class MainActivity extends AppCompatActivity
         XMLParser.Item[] newArray = new XMLParser.Item[magList.size()];
 
         int i = 0;
-        for (XMLParser.Item Item: magList)
-        {
+        for (XMLParser.Item Item : magList) {
             newArray[i] = Item;
             i++;
         }
@@ -153,8 +217,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void addItemsToSpinner(List<XMLParser.Item> items)
-    {
+    public void addItemsToSpinner(List<XMLParser.Item> items) {
         spinner = findViewById(R.id.spinner);
         spinner2 = findViewById(R.id.spinner2);
         spinner3 = findViewById(R.id.spinner3);
@@ -166,34 +229,31 @@ public class MainActivity extends AppCompatActivity
 
         int i = 0;
         int j = 1;
-        for (XMLParser.Item item:items) {
+        for (XMLParser.Item item : items) {
 
-            if(!list.contains(item.pubDate))
+            if (!list.contains(item.pubDate))
                 list.add(item.pubDate);
 
 
-            if(!magList.contains(item.magnitude)) {
+            if (!magList.contains(item.magnitude)) {
                 magList.add(item.magnitude);
 
             }
         }
 
-        maglist =  new Float[magList.size()];
+        maglist = new Float[magList.size()];
 
-        for (String item:magList) {
+        for (String item : magList) {
             maglist[i] = Float.parseFloat(item);
             i++;
         }
 
         dateList = new String[list.size()];
 
-        for (String item:list) {
-            dateList[list.size()-j] = item;
+        for (String item : list) {
+            dateList[list.size() - j] = item;
             j++;
         }
-
-
-
 
 
         Arrays.sort(maglist);
@@ -208,27 +268,27 @@ public class MainActivity extends AppCompatActivity
         spinner4.setAdapter(magAdapter);
 
         spinner.setSelection(0);
-        spinner2.setSelection(dataAdapter.getCount()-1);
-        spinner3.setSelection(magAdapter.getCount()-1);
+        spinner2.setSelection(dataAdapter.getCount() - 1);
+        spinner3.setSelection(magAdapter.getCount() - 1);
         spinner4.setSelection(0);
 
         spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-            upRecView(spinner.getSelectedItem().toString(),spinner2.getSelectedItem().toString());
-        }
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                upRecView(spinner.getSelectedItem().toString(), spinner2.getSelectedItem().toString());
+            }
 
-        @Override
-        public void onNothingSelected(AdapterView<?> parentView) {
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
 
-        }
+            }
 
-    });
+        });
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                upRecView(spinner.getSelectedItem().toString(),spinner2.getSelectedItem().toString());
+                upRecView(spinner.getSelectedItem().toString(), spinner2.getSelectedItem().toString());
             }
 
             @Override
@@ -241,7 +301,7 @@ public class MainActivity extends AppCompatActivity
         spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                upRecViewMag(spinner3.getSelectedItem().toString(),spinner4.getSelectedItem().toString());
+                upRecViewMag(spinner3.getSelectedItem().toString(), spinner4.getSelectedItem().toString());
             }
 
             @Override
@@ -254,7 +314,7 @@ public class MainActivity extends AppCompatActivity
         spinner4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                upRecViewMag(spinner3.getSelectedItem().toString(),spinner4.getSelectedItem().toString());
+                upRecViewMag(spinner3.getSelectedItem().toString(), spinner4.getSelectedItem().toString());
             }
 
             @Override
@@ -264,78 +324,8 @@ public class MainActivity extends AppCompatActivity
 
         });
     }
-
-
-
-
-    public void startProgress()
-    {
-        // Run network access on a separate thread;
-        new Thread(new Task(urlSource)).start();
-    } //
-
-    // Need separate thread to access the internet resource over network
-    // Other neater solutions should be adopted in later iterations.
-    private class Task implements Runnable
-    {
-        private String url;
-
-        public Task(String aurl)
-        {
-            url = aurl;
-        }
-        @Override
-        public void run()
-        {
-
-            URL aurl;
-            URLConnection yc;
-            BufferedReader in = null;
-            String inputLine = "";
-
-
-            try {
-
-                aurl = new URL(url);
-                yc = aurl.openConnection();
-
-                myItems = parse(yc.getInputStream());
-
-                for (XMLParser.Item item : myItems)
-                {
-                    item.title = item.summary.split(";")[1];
-
-                    String[] date = item.pubDate.split(" ");
-                    item.pubDate = date[1];
-                    item.pubDate += " " + date[2];
-                    item.pubDate += " " + date[3];
-
-                    String[] mag = item.summary.split(";");
-                    String[] newMag = mag[4].split(":");
-                    item.magnitude = newMag[1];
-
-                }
-
-            }
-            catch (IOException ae)
-            {
-                Log.e("MyTag", "ioexception");
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            }
-
-            MainActivity.this.runOnUiThread(new Runnable() {
-
-                public void run() {
-                    Log.d("UI thread", "I am the UI thread");
-                    resViewSetup(myItems);
-                    addItemsToSpinner(myItems);
-
-                }
-                //rawDataDisplay.setText(myItems.get(0).title);
-            });
-        }
-
-    }
-
 }
+
+
+
+
