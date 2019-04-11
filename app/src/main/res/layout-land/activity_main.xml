@@ -15,89 +15,100 @@
             android:layout_margin="10dp"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/salutation"
-                android:layout_width="fill_parent"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/salutation"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/salutation"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/acknowledgement"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/acknowledgement"
+                    android:textSize="10sp" />
+
+
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="221dp"
+                    android:layout_height="wrap_content"
+                    android:text="Sleect a Card below to see where the earthquake happend on a map."
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+
+            </LinearLayout>
+
+            <GridLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/salutation"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused"
-                android:textSize="20sp" />
+                android:background="@drawable/common_google_signin_btn_icon_dark_normal_background">
 
-            <TextView
-                android:id="@+id/acknowledgement"
-                android:layout_width="fill_parent"
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Start Date"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+
+                <Spinner
+                    android:id="@+id/spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_row="1"
+                    android:layout_column="0"
+                    android:text="End Date"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+
+                <Spinner
+                    android:id="@+id/spinner2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </GridLayout>
+
+            <GridLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/acknowledgement"
-                android:textSize="10sp" />
+                android:background="@drawable/common_google_signin_btn_icon_dark_normal_background">
 
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Max Magnitude"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused" />
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="29dp" />
+                <Spinner
+                    android:id="@+id/spinner3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="221dp"
-                android:layout_height="wrap_content"
-                android:text="Sleect a Card below to see where the earthquake happend on a map."
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+                <TextView
+                    android:id="@+id/textView10"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_row="1"
+                    android:layout_column="0"
+                    android:text="Min Magnitude"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused" />
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="16dp" />
-
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Start Date"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
-
-            <Spinner
-                android:id="@+id/spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="End Date"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
-
-            <Spinner
-                android:id="@+id/spinner2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/textView7"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Max Magnitude"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
-
-            <Spinner
-                android:id="@+id/spinner3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/textView10"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Min Magnitude"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused" />
-
-            <Spinner
-                android:id="@+id/spinner4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="35dp" />
-
+                <Spinner
+                    android:id="@+id/spinner4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </GridLayout>
 
         </LinearLayout>
 
