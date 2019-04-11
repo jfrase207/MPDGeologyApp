@@ -52,16 +52,17 @@ public class XMLParser {
 
     public static class Item {
 
-        public String title, link, summary, pubDate;
+        public String title, link, summary, pubDate, magnitude;
         public float lat,lon;
 
-        public Item(String title, String summary, String link, float lat, float lon, String pubDate) {
+        public Item(String title, String summary, String link, float lat, float lon, String pubDate, String magnitude) {
             this.title = title;
             this.summary = summary;
             this.link = link;
             this.lat = lat;
             this.lon = lon;
             this.pubDate = pubDate;
+            this.magnitude = magnitude;
         }
 
 
@@ -76,6 +77,7 @@ public class XMLParser {
             float lat = 0;
             float lon = 0;
             String pubDate = null;
+            String magnitude = null;
 
             while (parser.next() != XmlPullParser.END_TAG) {
                 if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -98,7 +100,7 @@ public class XMLParser {
                     skip(parser);
                 }
             }
-            return new Item(title, summary, link, lat, lon, pubDate );
+            return new Item(title, summary, link, lat, lon, pubDate, magnitude );
         }
 
         public  static String readString(XmlPullParser parser, String tag) throws IOException, XmlPullParserException {

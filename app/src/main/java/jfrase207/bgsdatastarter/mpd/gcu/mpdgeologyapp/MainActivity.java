@@ -16,13 +16,13 @@ package jfrase207.bgsdatastarter.mpd.gcu.mpdgeologyapp;
 // Update the package name to include your Student Identifier
 
 
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -32,15 +32,15 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static jfrase207.bgsdatastarter.mpd.gcu.mpdgeologyapp.XMLParser.parse;
 
-public class MainActivity extends AppCompatActivity implements OnClickListener
+public class MainActivity extends AppCompatActivity
 {
     public static final String EXTRA_MESSAGE = "jfrase207.bgsdatastarter.mpd.gcu.mpdgeologyapp.POSITION";
     private String url1="";
@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener
     List<XMLParser.Item> myItems = new ArrayList<>();
     private Spinner spinner;
     private Spinner spinner2;
+    private Spinner spinner3;
+    private Spinner spinner4;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -90,23 +92,25 @@ public class MainActivity extends AppCompatActivity implements OnClickListener
         recyclerView.setAdapter(mAdapter);
     }
 
+
     public void upRecView(String starDate, String endDate)
     {
         List<XMLParser.Item> list = new ArrayList<>();
+
         boolean start = false;
+
 
         for (XMLParser.Item item: myItems) {
             if(item.pubDate == endDate)
-            {
                 start = true;
-            }
             else if(item.pubDate == starDate)
                 start = false;
 
             if(start)
                 list.add(item);
-
         }
+
+
 
         XMLParser.Item[] newArray = new XMLParser.Item[list.size()];
 
@@ -117,28 +121,96 @@ public class MainActivity extends AppCompatActivity implements OnClickListener
             i++;
         }
 
+
+
         mAdapter = new MyAdapter(newArray);
         recyclerView.setAdapter(mAdapter);
     }
+
+    public void upRecViewMag(String maxMag,String minMag)
+    {
+        List<XMLParser.Item> magList = new ArrayList<>();
+
+        for (XMLParser.Item item: myItems) {
+
+            if(Float.parseFloat(item.magnitude) <= Float.parseFloat(maxMag) && Float.parseFloat(item.magnitude) >= Float.parseFloat(minMag))
+                magList.add(item);
+        }
+
+
+        XMLParser.Item[] newArray = new XMLParser.Item[magList.size()];
+
+        int i = 0;
+        for (XMLParser.Item Item: magList)
+        {
+            newArray[i] = Item;
+            i++;
+        }
+
+
+        mAdapter = new MyAdapter(newArray);
+        recyclerView.setAdapter(mAdapter);
+    }
+
 
     public void addItemsToSpinner(List<XMLParser.Item> items)
     {
         spinner = findViewById(R.id.spinner);
         spinner2 = findViewById(R.id.spinner2);
+        spinner3 = findViewById(R.id.spinner3);
+        spinner4 = findViewById(R.id.spinner4);
         List<String> list = new ArrayList<>();
+        List<String> magList = new ArrayList<>();
+        Float maglist[];
+        String dateList[];
 
+        int i = 0;
+        int j = 1;
         for (XMLParser.Item item:items) {
 
             if(!list.contains(item.pubDate))
                 list.add(item.pubDate);
+
+
+            if(!magList.contains(item.magnitude)) {
+                magList.add(item.magnitude);
+
+            }
         }
 
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
+        maglist =  new Float[magList.size()];
+
+        for (String item:magList) {
+            maglist[i] = Float.parseFloat(item);
+            i++;
+        }
+
+        dateList = new String[list.size()];
+
+        for (String item:list) {
+            dateList[list.size()-j] = item;
+            j++;
+        }
+
+
+
+
+
+        Arrays.sort(maglist);
+
+        final ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, dateList);
+        final ArrayAdapter<Float> magAdapter = new ArrayAdapter<Float>(this, android.R.layout.simple_spinner_item, maglist);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        magAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
         spinner2.setAdapter(dataAdapter);
+        spinner3.setAdapter(magAdapter);
+        spinner4.setAdapter(magAdapter);
 
-
+        spinner.setSelection(0);
+        spinner2.setSelection(dataAdapter.getCount()-1);
+        spinner3.setSelection(magAdapter.getCount()-1);
+        spinner4.setSelection(0);
 
         spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
         @Override
@@ -165,13 +237,36 @@ public class MainActivity extends AppCompatActivity implements OnClickListener
             }
 
         });
+
+        spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                upRecViewMag(spinner3.getSelectedItem().toString(),spinner4.getSelectedItem().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+
+            }
+
+        });
+
+        spinner4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                upRecViewMag(spinner3.getSelectedItem().toString(),spinner4.getSelectedItem().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+
+            }
+
+        });
     }
 
 
-    public void onClick(View aview)
-    {
 
-    }
 
     public void startProgress()
     {
@@ -214,6 +309,11 @@ public class MainActivity extends AppCompatActivity implements OnClickListener
                     item.pubDate = date[1];
                     item.pubDate += " " + date[2];
                     item.pubDate += " " + date[3];
+
+                    String[] mag = item.summary.split(";");
+                    String[] newMag = mag[4].split(":");
+                    item.magnitude = newMag[1];
+
                 }
 
             }
