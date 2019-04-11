@@ -28,7 +28,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
             super(v);
             title = v.findViewById(R.id.title);
             description = v.findViewById(R.id.description);
-            link = v.findViewById(R.id.link);
+            //link = v.findViewById(R.id.link);
 
         }
     }
@@ -54,7 +54,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
 
         holder.title.setText(mDataset[position].title);
         holder.description.setText(mDataset[position].summary);
-        holder.link.setText(mDataset[position].link);
+        //holder.link.setText(mDataset[position].link);
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {

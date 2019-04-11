@@ -78,6 +78,12 @@
             android:layout_width="match_parent"
             android:layout_height="35dp" />
 
+        <view
+            class="android.support.constraint.Barrier"
+            id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rView"
             android:layout_width="match_parent"
